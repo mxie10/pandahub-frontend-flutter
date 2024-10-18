@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:pandahubfrontend/screens/create/date_picker.dart';
+import 'package:pandahubfrontend/screens/home/home.dart';
+import 'package:pandahubfrontend/services/events_store.dart';
 import 'package:pandahubfrontend/shared/styled_text_field.dart';
 import 'package:pandahubfrontend/shared/styled_title.dart';
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
+
+var uuid = const Uuid();
 
 const List<String> eventTypeList = <String>[
   'Conference',
@@ -27,6 +33,7 @@ class _CreateScreenState extends State<CreateScreen> {
   late final TextEditingController _organizerController;
 
   String? _selectedEventType;
+  String? _combinedDateTime;
 
   List<Map<String, dynamic>> get statsAsFormattedList => [
     {"title": 'Event title', 'controller': _titleController},
@@ -44,6 +51,33 @@ class _CreateScreenState extends State<CreateScreen> {
     _descriptionController = TextEditingController();
     _locationController = TextEditingController();
     _organizerController = TextEditingController();
+  }
+
+
+  void _onDateChanged(DateTime date) {
+    setState(() {
+      _selectedDate = date; 
+    });
+  }
+
+  void _onTimeChanged(TimeOfDay time) {
+    setState(() {
+      _selectedTime = time; 
+    });
+  }
+
+  void onCreateEvent(){
+    Map<String, dynamic> map = {};
+    map['id'] = uuid.v4();
+    map['title'] = _titleController.text;
+    map['description'] = _descriptionController.text;
+    map['date'] = DateTime(_selectedDate!.year, _selectedDate!.month, _selectedDate!.day, _selectedTime!.hour, _selectedTime!.minute).toString();
+    map['location'] = _locationController.text;
+    map['organizer'] = _organizerController.text;
+    map['eventType'] = _selectedEventType;
+
+    Provider.of<EventStore>(context, listen: false).addEvent(map);
+     Navigator.push(context, MaterialPageRoute(builder: (ctx) => const Home()));
   }
 
   @override
@@ -67,12 +101,16 @@ class _CreateScreenState extends State<CreateScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
+              // Date time picker
               DateTimePicker(
-                initialDate: _selectedDate,
-                initialTime: _selectedTime,
+                selectedDate: _selectedDate,
+                selectedTime: _selectedTime,
                 dateController: _dateController,
                 timeController: _timeController,
+                onDateChanged: _onDateChanged,
+                onTimeChanged: _onTimeChanged
               ),
+              // Rest fields 
               ...statsAsFormattedList.map((item) {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 10),
@@ -82,7 +120,7 @@ class _CreateScreenState extends State<CreateScreen> {
                   ),
                 );
               }),
-              // Dropdown for event types
+              // Dropdown list for event types
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: DropdownButtonFormField<String>(
@@ -120,10 +158,11 @@ class _CreateScreenState extends State<CreateScreen> {
                   dropdownColor: Colors.black,
                 ),
               ),
+              // Create button
               FilledButton(onPressed: (){
-                print(_descriptionController.text);
+                onCreateEvent();
               }, 
-                child: const Text('test')
+                child: const Text('Create')
               )
             ],
           ),

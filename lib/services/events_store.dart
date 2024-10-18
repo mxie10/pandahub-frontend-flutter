@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pandahubfrontend/models/event.dart';
+import 'package:provider/provider.dart';
 
 class EventStore extends ChangeNotifier {
   List<dynamic> _events = [];
@@ -18,6 +19,7 @@ class EventStore extends ChangeNotifier {
     fetchEvents();
   }
 
+  // fetch events
   void fetchEvents() {
     FirebaseFirestore.instance
         .collection('events')
@@ -31,28 +33,27 @@ class EventStore extends ChangeNotifier {
     });
   }
 
-  // Future<void> fetchEvents() async {
-  //   _isLoading = true;
-  //   notifyListeners();
+  // add event
+  Future<void> addEvent(Map<String, dynamic> data) async {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'id':data['id'],
+        'title': data['title'],
+        'description': data['description'],
+        'location': data['location'],
+        'organizer': data['organizer'],
+        'eventType': data['eventType'],
+        'date': data['date'],
+      }),
+    );
 
-  //   try {
-  //     final response = await http.get(Uri.parse(url));
-  //     if (response.statusCode == 200) {
-  //       final List<dynamic> jsonData = json.decode(response.body);
-  //       List<Event> events = jsonData.map((eventJson) {
-  //         String id = eventJson['id'] ?? '';
-  //         return Event.fromJson(id, eventJson);
-  //       }).toList();
-  //       _events = events;
-  //       notifyListeners();
-  //     } else {
-  //       throw Exception('Failed to load events');
-  //     }
-  //   } catch (error) {
-  //     print('Error: ${error}');
-  //   } finally {
-  //     _isLoading = false;
-  //     notifyListeners();
-  //   }
-  // }
+    if (response.statusCode == 201) {
+      fetchEvents(); 
+    } else {
+      // Handle error
+      print('Failed to add event: ${response.body}');
+    }
+  }
 }

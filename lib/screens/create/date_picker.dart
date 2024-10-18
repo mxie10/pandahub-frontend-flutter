@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:pandahubfrontend/shared/styled_text_field.dart';
 
 class DateTimePicker extends StatefulWidget {
-  final DateTime? initialDate;
-  final TimeOfDay? initialTime;
+  final DateTime? selectedDate;
+  final TimeOfDay? selectedTime;
   final TextEditingController dateController;
   final TextEditingController timeController;
-
+  final Function(DateTime) onDateChanged;
+  final Function(TimeOfDay) onTimeChanged;
 
   const DateTimePicker({
     super.key,
-    this.initialDate,
-    this.initialTime,
+    this.selectedDate,
+    this.selectedTime,
     required this.dateController,
     required this.timeController,
+    required this.onDateChanged,
+    required this.onTimeChanged
   });
 
   @override
@@ -22,14 +25,14 @@ class DateTimePicker extends StatefulWidget {
 }
 
 class _DateTimePickerState extends State<DateTimePicker> {
-  DateTime? _selectedDate;
-  TimeOfDay? _selectedTime;
+  late DateTime? _selectedDate;
+  late TimeOfDay? _selectedTime;
 
   @override
   void initState() {
     super.initState();
-    _selectedDate = widget.initialDate ?? DateTime.now();
-    _selectedTime = widget.initialTime ?? TimeOfDay.now();
+    _selectedDate = widget.selectedDate ?? DateTime.now();
+    _selectedTime = widget.selectedTime ?? TimeOfDay.now();
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -43,6 +46,7 @@ class _DateTimePickerState extends State<DateTimePicker> {
       setState(() {
         _selectedDate = pickedDate;
       });
+      widget.onDateChanged(pickedDate);
       _updateDateInTextField();
     }
   }
@@ -56,6 +60,7 @@ class _DateTimePickerState extends State<DateTimePicker> {
       setState(() {
         _selectedTime = pickedTime;
       });
+      widget.onTimeChanged(pickedTime);
       _updateTimeInTextField();
     }
   }
@@ -71,7 +76,8 @@ class _DateTimePickerState extends State<DateTimePicker> {
 
   @override
   void dispose() {
-    widget.dateController.dispose(); // Dispose of the controller when no longer needed
+    // Dispose of the controller when no longer needed
+    widget.dateController.dispose(); 
     super.dispose();
   }
 
