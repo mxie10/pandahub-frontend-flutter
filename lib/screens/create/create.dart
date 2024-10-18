@@ -3,6 +3,12 @@ import 'package:pandahubfrontend/screens/create/date_picker.dart';
 import 'package:pandahubfrontend/shared/styled_text_field.dart';
 import 'package:pandahubfrontend/shared/styled_title.dart';
 
+const List<String> eventTypeList = <String>[
+  'Conference',
+  'Workshop',
+  'Webinar',
+];
+
 class CreateScreen extends StatefulWidget {
   const CreateScreen({super.key});
 
@@ -19,16 +25,16 @@ class _CreateScreenState extends State<CreateScreen> {
   late final TextEditingController _descriptionController;
   late final TextEditingController _locationController;
   late final TextEditingController _organizerController;
-  late final TextEditingController _eventTypeController;
 
-  List<Map<String,dynamic>> get statsAsFormattedList => [
-    {"title":'Event title','controller':_titleController},
-    {"title":'Event description','controller':_descriptionController},
-    {"title":'Event location','controller':_locationController},
-    {"title":'Event organizer','controller':_organizerController},
-    {"title":'Event type','controller':_eventTypeController},
+  String? _selectedEventType;
+
+  List<Map<String, dynamic>> get statsAsFormattedList => [
+    {"title": 'Event title', 'controller': _titleController},
+    {"title": 'Event description', 'controller': _descriptionController},
+    {"title": 'Event location', 'controller': _locationController},
+    {"title": 'Event organizer', 'controller': _organizerController},
   ];
-  
+
   @override
   void initState() {
     super.initState();
@@ -38,7 +44,6 @@ class _CreateScreenState extends State<CreateScreen> {
     _descriptionController = TextEditingController();
     _locationController = TextEditingController();
     _organizerController = TextEditingController();
-    _eventTypeController = TextEditingController();
   }
 
   @override
@@ -50,7 +55,6 @@ class _CreateScreenState extends State<CreateScreen> {
     _descriptionController.dispose();
     _locationController.dispose();
     _organizerController.dispose();
-    _eventTypeController.dispose();
     super.dispose();
   }
 
@@ -59,27 +63,72 @@ class _CreateScreenState extends State<CreateScreen> {
     return Scaffold(
       appBar: AppBar(title: const StyledTitle('Create Event')),
       body: Container(
-          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-          child: SingleChildScrollView(
-              child: Column( 
-                children: [
-                  DateTimePicker(
-                    initialDate: _selectedDate,
-                    initialTime: _selectedTime,
-                    dateController: _dateController,
-                    timeController: _timeController
+        padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              DateTimePicker(
+                initialDate: _selectedDate,
+                initialTime: _selectedTime,
+                dateController: _dateController,
+                timeController: _timeController,
+              ),
+              ...statsAsFormattedList.map((item) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: StyledTextField(
+                    textFieldcontroller: item['controller'],
+                    labelText: item['title'],
                   ),
-                  ...statsAsFormattedList.map((item) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: StyledTextField(
-                        textFieldcontroller: item['controller'], 
-                        labelText: item['title']
+                );
+              }),
+              // Dropdown for event types
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: DropdownButtonFormField<String>(
+                  value: _selectedEventType,
+                  hint: const Text(
+                    'Select Event Type',
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 133, 131, 131),
+                      fontSize: 14
+                    ), 
+                  ),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedEventType = newValue;
+                    });
+                  },
+                  items: eventTypeList.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        value,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14
+                        ), 
                       ),
                     );
                   }).toList(),
-                ],
-          ))),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(4.0), // Rounded corners
+                      borderSide: const BorderSide(color: Colors.grey), // Border color when enabled
+                    ),
+                  ),
+                  dropdownColor: Colors.black,
+                ),
+              ),
+              FilledButton(onPressed: (){
+                print(_descriptionController.text);
+              }, 
+                child: const Text('test')
+              )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
