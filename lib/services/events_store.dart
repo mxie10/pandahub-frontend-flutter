@@ -7,6 +7,7 @@ import 'package:pandahubfrontend/models/event.dart';
 
 class EventStore extends ChangeNotifier {
   List<dynamic> _events = [];
+  List<dynamic> _allEvents = [];
   bool _isLoading = false;
 
   List<dynamic> get events => _events;
@@ -20,10 +21,10 @@ class EventStore extends ChangeNotifier {
 
   void _setLoading(bool loading) {
     _isLoading = loading;
-    notifyListeners(); // This ensures the UI is updated when the loading state changes
+    notifyListeners(); 
   }
 
-  // Fetch events
+// Fetch events
   void fetchEvents() {
     _setLoading(true);
     try {
@@ -31,12 +32,14 @@ class EventStore extends ChangeNotifier {
           .collection('events')
           .snapshots()
           .listen((snapshot) {
-        _events = snapshot.docs.map((doc) {
+        _allEvents = snapshot.docs.map((doc) {
           final data = doc.data();
           return Event.fromJson(doc.id, data);
         }).toList();
+        _events = List.from(_allEvents); 
         notifyListeners();
       });
+    } catch (e) {
     } finally {
       _setLoading(false);
     }
@@ -62,10 +65,9 @@ class EventStore extends ChangeNotifier {
 
       if (response.statusCode == 201) {
         notifyListeners();
-      } else {
-        // Handle error
-        print('Failed to add event: ${response.body}');
-      }
+      } 
+    }catch(e){
+      rethrow;
     } finally {
       _setLoading(false);
     }
@@ -77,7 +79,7 @@ class EventStore extends ChangeNotifier {
     try {
       final response = await http.put(
         Uri.parse(
-            '$url/${data['id']}'), // Assuming the URL includes the event ID
+            '$url/${data['id']}'), 
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'id': data['id'],
@@ -92,10 +94,9 @@ class EventStore extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         notifyListeners(); 
-      } else {
-        // Handle error
-        print('Failed to update event: ${response.body}');
       }
+    }catch(e){
+      rethrow;
     } finally {
       _setLoading(false);
     }
@@ -113,11 +114,21 @@ class EventStore extends ChangeNotifier {
       if (response.statusCode == 200) {
         _events.removeWhere((event) => event.id == eventId);
         notifyListeners(); 
-      } else {
-        print('Failed to delete event: ${response.body}');
       }
+    }catch(e){
+      rethrow;
     } finally {
       _setLoading(false);
     }
+  }
+
+  // Filter by event type
+  void filterByEventType(String eventType) {
+    if (eventType == 'All') {
+      _events = List.from(_allEvents); 
+    } else {
+      _events = _allEvents.where((event) => event.eventType == eventType).toList();
+    }
+    notifyListeners(); 
   }
 }

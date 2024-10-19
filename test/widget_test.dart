@@ -8,7 +8,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:pandahubfrontend/main.dart';
 import 'package:pandahubfrontend/screens/home/home.dart';
 
 void main() {

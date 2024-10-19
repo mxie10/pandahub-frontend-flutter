@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:pandahubfrontend/models/event.dart';
 import 'package:pandahubfrontend/screens/create/date_picker.dart';
-import 'package:pandahubfrontend/screens/home/home.dart';
 import 'package:pandahubfrontend/services/events_store.dart';
+import 'package:pandahubfrontend/shared/styled_button.dart';
+import 'package:pandahubfrontend/shared/styled_heading.dart';
+import 'package:pandahubfrontend/shared/styled_text.dart';
 import 'package:pandahubfrontend/shared/styled_text_field.dart';
 import 'package:pandahubfrontend/shared/styled_title.dart';
+import 'package:pandahubfrontend/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -75,32 +78,59 @@ class _DetailsScreenState extends State<DetailsScreen> {
   }
 
   void onUpdateEvent() {
-    Map<String, dynamic> map = {};
-    map['id'] = widget.event.id;
-    map['title'] = _titleController.text;
-    map['description'] = _descriptionController.text;
-    map['date'] = _dateController.text + ' ' + _timeController.text;
-    map['location'] = _locationController.text;
-    map['organizer'] = _organizerController.text;
-    map['eventType'] = _selectedEventType;
+    if (_dateController.text.trim().isEmpty ||
+        _timeController.text.trim().isEmpty ||
+        _titleController.text.trim().isEmpty) {
+      showDialog(
+          context: context,
+          builder: (ctx) {
+            return AlertDialog(
+              backgroundColor: AppColors.secondaryAccent,
+              title: const StyledHeading('Oops! Some fields are missing!'),
+              content:
+                  const StyledText('Event date and event title is needed!'),
+              actions: [
+                StyledButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                  },
+                  child: const StyledHeading('close'),
+                )
+              ],
+              actionsAlignment: MainAxisAlignment.center,
+            );
+          });
+      return;
+    }
+    try {
+      Map<String, dynamic> map = {};
+      map['id'] = widget.event.id;
+      map['title'] = _titleController.text;
+      map['description'] = _descriptionController.text;
+      map['date'] = '${_dateController.text} ${_timeController.text}';
+      map['location'] = _locationController.text;
+      map['organizer'] = _organizerController.text;
+      map['eventType'] = _selectedEventType;
 
-    Provider.of<EventStore>(context, listen: false).updateEvent(map);
+      Provider.of<EventStore>(context, listen: false).updateEvent(map);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   void onDeleteEvent() {
-     Provider.of<EventStore>(context, listen: false).deleteEvent(widget.event.id);
-     Navigator.push(context, MaterialPageRoute(builder: (ctx) => const Home()));
+    try {
+      Provider.of<EventStore>(context, listen: false)
+          .deleteEvent(widget.event.id);
+      Navigator.popUntil(context, (route) => route.isFirst);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @override
   void dispose() {
     // Dispose controllers to avoid memory leaks
-    _dateController.dispose();
-    _timeController.dispose();
-    _titleController.dispose();
-    _descriptionController.dispose();
-    _locationController.dispose();
-    _organizerController.dispose();
     super.dispose();
   }
 
@@ -161,14 +191,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           ),
                         );
                       }).toList(),
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(4.0), // Rounded corners
-                          borderSide: const BorderSide(
-                              color: Colors.grey), // Border color when enabled
-                        ),
-                      ),
+                     
                       dropdownColor: Colors.black,
                     ),
                   ),
@@ -178,13 +201,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     child: FilledButton(
                       onPressed: onUpdateEvent,
                       style: FilledButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 0, 0, 0),
+                        backgroundColor: const Color.fromARGB(255, 3, 3, 3),
                         foregroundColor: Colors.white,
                       ),
                       child: const Text('Update'),
                     ),
                   ),
-                  const SizedBox(height: 80), 
+                  const SizedBox(height: 80),
                 ],
               ),
             ),

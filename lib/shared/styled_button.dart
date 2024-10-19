@@ -16,7 +16,7 @@ class StyledButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: onPressed, 
-      style: ButtonStyle(),
+      style: const ButtonStyle(),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         decoration: const BoxDecoration(

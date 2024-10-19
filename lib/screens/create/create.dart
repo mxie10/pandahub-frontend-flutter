@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:pandahubfrontend/screens/create/date_picker.dart';
 import 'package:pandahubfrontend/screens/home/home.dart';
 import 'package:pandahubfrontend/services/events_store.dart';
+import 'package:pandahubfrontend/shared/styled_button.dart';
+import 'package:pandahubfrontend/shared/styled_heading.dart';
+import 'package:pandahubfrontend/shared/styled_text.dart';
 import 'package:pandahubfrontend/shared/styled_text_field.dart';
 import 'package:pandahubfrontend/shared/styled_title.dart';
+import 'package:pandahubfrontend/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -50,6 +54,10 @@ class _CreateScreenState extends State<CreateScreen> {
     _descriptionController = TextEditingController();
     _locationController = TextEditingController();
     _organizerController = TextEditingController();
+    _descriptionController.text = '';
+    _locationController.text = '';
+    _organizerController.text = '';
+    _selectedEventType = 'Conference';
   }
 
 
@@ -66,28 +74,49 @@ class _CreateScreenState extends State<CreateScreen> {
   }
 
   void onCreateEvent(){
-    Map<String, dynamic> map = {};
-    map['id'] = uuid.v4();
-    map['title'] = _titleController.text;
-    map['description'] = _descriptionController.text;
-    map['date'] = DateTime(_selectedDate!.year, _selectedDate!.month, _selectedDate!.day, _selectedTime!.hour, _selectedTime!.minute).toString();
-    map['location'] = _locationController.text;
-    map['organizer'] = _organizerController.text;
-    map['eventType'] = _selectedEventType;
+    
+    if(_dateController.text.trim().isEmpty || _timeController.text.trim().isEmpty || _titleController.text.trim().isEmpty){
+      showDialog(
+        context: context, 
+        builder: (ctx) {
+          return AlertDialog(
+            backgroundColor: AppColors.secondaryAccent,
+            title: const StyledHeading('Oops! Some fields are missing!'),
+            content: const StyledText('Event date and event title is needed!'),
+            actions: [
+              StyledButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                }, 
+                child: const StyledHeading('close'),
+              )
+            ],
+            actionsAlignment: MainAxisAlignment.center,
+          );
+        }
+      );
+      return;
+    }
+    try{
+      Map<String, dynamic> map = {};
+      map['id'] = uuid.v4();
+      map['title'] = _titleController.text;
+      map['description'] = _descriptionController.text;
+      map['date'] = DateTime(_selectedDate!.year, _selectedDate!.month, _selectedDate!.day, _selectedTime!.hour, _selectedTime!.minute).toString();
+      map['location'] = _locationController.text;
+      map['organizer'] = _organizerController.text;
+      map['eventType'] = _selectedEventType;
 
-    Provider.of<EventStore>(context, listen: false).addEvent(map);
-    Navigator.push(context, MaterialPageRoute(builder: (ctx) => const Home()));
+      Provider.of<EventStore>(context, listen: false).addEvent(map);
+      Navigator.popUntil(context, (route) => route.isFirst);
+    }catch(e){
+      rethrow;
+    }
   }
 
   @override
   void dispose() {
     // Dispose controllers to avoid memory leaks
-    _dateController.dispose();
-    _timeController.dispose();
-    _titleController.dispose();
-    _descriptionController.dispose();
-    _locationController.dispose();
-    _organizerController.dispose();
     super.dispose();
   }
 
@@ -150,8 +179,8 @@ class _CreateScreenState extends State<CreateScreen> {
                   }).toList(),
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(4.0), // Rounded corners
-                      borderSide: const BorderSide(color: Colors.grey), // Border color when enabled
+                      borderRadius: BorderRadius.circular(4.0), 
+                      borderSide: const BorderSide(color: Colors.grey), 
                     ),
                   ),
                   dropdownColor: Colors.black,

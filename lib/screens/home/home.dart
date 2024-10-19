@@ -4,6 +4,8 @@ import 'package:pandahubfrontend/screens/home/event_card.dart';
 import 'package:pandahubfrontend/services/events_store.dart';
 import 'package:provider/provider.dart';
 
+const List<String> list = <String>['All', 'Conference', 'Workshop', 'Webinar'];
+
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -13,9 +15,13 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
+  late String dropdownValue;
+
   @override
   void initState() {
     super.initState();
+    dropdownValue = 'All';
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<EventStore>(context, listen: false).fetchEvents();
     });
@@ -29,9 +35,40 @@ class _HomeState extends State<Home> {
       appBar: AppBar(title: const Text('Events List')),
       body: Column(
         children: [
-          if (eventProvider.isLoading) 
+          // dropdown button used for filter events
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: DropdownButton<String>(
+                value: dropdownValue,
+                icon: const Icon(Icons.arrow_downward),
+                elevation: 16,
+                style: const TextStyle(color: Colors.white),
+                onChanged: (String? value) {
+                  setState(() {
+                    dropdownValue = value!;
+                  });
+                  Provider.of<EventStore>(context, listen: false).filterByEventType(dropdownValue);
+                },
+                items: list.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                dropdownColor: Colors.black,
+              ),
+            ),
+          ),
+          if (eventProvider.isLoading)
             const Center(child: CircularProgressIndicator())
-          else 
+          else if(eventProvider.events.isEmpty)
+            const Expanded(
+              child: Center(child: Text('You don''t have any events now'))
+            )
+          else
+            // event list
             Expanded(
               child: Consumer<EventStore>(
                 builder: (context, value, child) {
@@ -47,9 +84,11 @@ class _HomeState extends State<Home> {
             ),
         ],
       ),
+      // Add button
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (ctx) => const CreateScreen()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (ctx) => const CreateScreen()));
         },
         foregroundColor: Colors.white,
         backgroundColor: Colors.grey,
