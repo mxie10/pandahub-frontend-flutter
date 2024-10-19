@@ -21,9 +21,9 @@ class Event {
   final String eventType;
   final Timestamp updatedAt;
 
-  factory Event.fromJson(String id, Map<String, dynamic> json) {
+  factory Event.fromJson(Map<String, dynamic> json) {
     return Event(
-        id: id,
+        id: json['id'],
         title: json['title'] ?? '',
         description: json['description'] ?? '',
         date: json['date'] ?? '',

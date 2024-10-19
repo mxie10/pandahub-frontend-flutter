@@ -114,6 +114,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   void onDeleteEvent() {
     try {
+      print(widget.event);
       Provider.of<EventStore>(context, listen: false)
           .deleteEvent(widget.event.id);
       Navigator.popUntil(context, (route) => route.isFirst);

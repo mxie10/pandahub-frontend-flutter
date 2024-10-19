@@ -35,7 +35,7 @@ class EventStore extends ChangeNotifier {
           .listen((snapshot) {
         _allEvents = snapshot.docs.map((doc) {
           final data = doc.data();
-          return Event.fromJson(doc.id, data);
+          return Event.fromJson(data);
         }).toList();
         _events = List.from(_allEvents); 
         notifyListeners();
@@ -109,6 +109,7 @@ class EventStore extends ChangeNotifier {
   Future<void> deleteEvent(String eventId) async {
     _setLoading(true);
     try {
+      print(eventId);
       final response = await http.delete(
         Uri.parse('$url/$eventId'), 
         headers: {'Content-Type': 'application/json'},
