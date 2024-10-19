@@ -19,7 +19,7 @@ void main() async {
       child: MaterialApp(
         theme: primaryTheme,
         home: const Home()
-        ),
+      ),
     ));
 }
 

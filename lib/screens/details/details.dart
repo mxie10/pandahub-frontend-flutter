@@ -3,7 +3,6 @@ import 'package:pandahubfrontend/models/event.dart';
 import 'package:pandahubfrontend/screens/create/date_picker.dart';
 import 'package:pandahubfrontend/screens/home/home.dart';
 import 'package:pandahubfrontend/services/events_store.dart';
-import 'package:pandahubfrontend/shared/styled_button.dart';
 import 'package:pandahubfrontend/shared/styled_text_field.dart';
 import 'package:pandahubfrontend/shared/styled_title.dart';
 import 'package:provider/provider.dart';
