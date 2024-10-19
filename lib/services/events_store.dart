@@ -14,7 +14,7 @@ class EventStore extends ChangeNotifier {
   List<dynamic> get events => _events;
   bool get isLoading => _isLoading;
 
-  final url = dotenv.env['API_URL'] ?? '';
+  final url = dotenv.env['API_URL'];
 
   EventStore() {
     fetchEvents();
@@ -53,7 +53,7 @@ class EventStore extends ChangeNotifier {
     try {
       
       final response = await http.post(
-        Uri.parse(url),
+        Uri.parse(url!),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'id': data['id'],
@@ -109,7 +109,6 @@ class EventStore extends ChangeNotifier {
   Future<void> deleteEvent(String eventId) async {
     _setLoading(true);
     try {
-      print(eventId);
       final response = await http.delete(
         Uri.parse('$url/$eventId'), 
         headers: {'Content-Type': 'application/json'},
