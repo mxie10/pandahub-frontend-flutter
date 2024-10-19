@@ -24,7 +24,7 @@ class EventCard extends StatelessWidget {
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [StyledHeading(event.title), StyledText(event.date)],
+              children: [StyledHeading(event.title), StyledText(event.date.substring(0, 16))],
             ),
             const Expanded(child: SizedBox()),
             Icon(Icons.arrow_forward, color: AppColors.textColor)
