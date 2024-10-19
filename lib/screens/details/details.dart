@@ -8,6 +8,7 @@ import 'package:pandahubfrontend/shared/styled_text.dart';
 import 'package:pandahubfrontend/shared/styled_text_field.dart';
 import 'package:pandahubfrontend/shared/styled_title.dart';
 import 'package:pandahubfrontend/theme.dart';
+import 'package:pandahubfrontend/utils/dialog_util.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -81,38 +82,31 @@ class _DetailsScreenState extends State<DetailsScreen> {
     if (_dateController.text.trim().isEmpty ||
         _timeController.text.trim().isEmpty ||
         _titleController.text.trim().isEmpty) {
-      showDialog(
-          context: context,
-          builder: (ctx) {
-            return AlertDialog(
-              backgroundColor: AppColors.secondaryAccent,
-              title: const StyledHeading('Oops! Some fields are missing!'),
-              content:
-                  const StyledText('Event date and event title is needed!'),
-              actions: [
-                StyledButton(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                  },
-                  child: const StyledHeading('close'),
-                )
-              ],
-              actionsAlignment: MainAxisAlignment.center,
-            );
-          });
+
+      showCustomDialog(
+        context, 
+        'Oops! Some fields are missing!',
+        'Event date and event title is needed!');
       return;
     }
+
     try {
       Map<String, dynamic> map = {};
       map['id'] = widget.event.id;
-      map['title'] = _titleController.text;
-      map['description'] = _descriptionController.text;
+      map['title'] = _titleController.text.trim();
+      map['description'] = _descriptionController.text.trim();
       map['date'] = '${_dateController.text} ${_timeController.text}';
-      map['location'] = _locationController.text;
-      map['organizer'] = _organizerController.text;
+      map['location'] = _locationController.text.trim();
+      map['organizer'] = _organizerController.text.trim();
       map['eventType'] = _selectedEventType;
 
       Provider.of<EventStore>(context, listen: false).updateEvent(map);
+      
+      showCustomDialog(
+        context, 
+        'Success!',
+        'The event has been successfully updated!'
+      );
     } catch (e) {
       rethrow;
     }
@@ -191,7 +185,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           ),
                         );
                       }).toList(),
-                     
                       dropdownColor: Colors.black,
                     ),
                   ),

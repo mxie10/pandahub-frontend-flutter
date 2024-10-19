@@ -22,7 +22,6 @@ class Event {
   final Timestamp updatedAt;
 
   factory Event.fromJson(String id, Map<String, dynamic> json) {
-
     return Event(
         id: id,
         title: json['title'] ?? '',

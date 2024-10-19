@@ -35,7 +35,7 @@ class _HomeState extends State<Home> {
       appBar: AppBar(title: const Text('Events List')),
       body: Column(
         children: [
-          // dropdown button used for filter events
+          // Dropdown button used for filter events
           Align(
             alignment: Alignment.centerLeft,
             child: Padding(
@@ -68,7 +68,7 @@ class _HomeState extends State<Home> {
               child: Center(child: Text('You don''t have any events now'))
             )
           else
-            // event list
+            // Event list
             Expanded(
               child: Consumer<EventStore>(
                 builder: (context, value, child) {
