@@ -40,7 +40,8 @@ class EventStore extends ChangeNotifier {
         _events = List.from(_allEvents); 
         notifyListeners();
       });
-    } catch (e) {
+    }catch (e) {
+      rethrow;
     } finally {
       _setLoading(false);
     }
