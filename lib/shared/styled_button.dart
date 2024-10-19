@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:pandahubfrontend/theme.dart';
 
 class StyledButton extends StatelessWidget {
   const StyledButton({
       super.key,
       required this.onPressed,
-      required this.child
+      required this.child,
+      this.backgroundColor
   });
 
   final Function() onPressed;
   final Widget child;
+  final WidgetStateProperty<Color?>? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: onPressed, 
+      style: ButtonStyle(),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         decoration: const BoxDecoration(

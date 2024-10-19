@@ -33,7 +33,6 @@ class _CreateScreenState extends State<CreateScreen> {
   late final TextEditingController _organizerController;
 
   String? _selectedEventType;
-  String? _combinedDateTime;
 
   List<Map<String, dynamic>> get statsAsFormattedList => [
     {"title": 'Event title', 'controller': _titleController},
@@ -77,7 +76,7 @@ class _CreateScreenState extends State<CreateScreen> {
     map['eventType'] = _selectedEventType;
 
     Provider.of<EventStore>(context, listen: false).addEvent(map);
-     Navigator.push(context, MaterialPageRoute(builder: (ctx) => const Home()));
+    Navigator.push(context, MaterialPageRoute(builder: (ctx) => const Home()));
   }
 
   @override

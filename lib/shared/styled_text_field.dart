@@ -7,12 +7,14 @@ class StyledTextField extends StatelessWidget {
     required this.labelText,
     this.icon, 
     this.onPress, 
+    this.defaultValue,
   });
-
+  
   final TextEditingController textFieldcontroller;
   final String labelText;
   final Icon? icon; 
   final VoidCallback? onPress; 
+  final String? defaultValue;
 
   @override
   Widget build(BuildContext context) {
