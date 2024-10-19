@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:pandahubfrontend/models/event.dart';
 
@@ -13,7 +14,7 @@ class EventStore extends ChangeNotifier {
   List<dynamic> get events => _events;
   bool get isLoading => _isLoading;
 
-  final url = 'https://api-zh73dsuc2a-uc.a.run.app/api/events';
+  final url = dotenv.env['API_URL'] ?? '';
 
   EventStore() {
     fetchEvents();
