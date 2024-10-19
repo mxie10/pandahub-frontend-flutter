@@ -86,7 +86,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
       showCustomDialog(
         context, 
         'Oops! Some fields are missing!',
-        'Event date and event title is needed!');
+        'Event date, time and title are needed!');
       return;
     }
 
