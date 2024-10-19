@@ -132,7 +132,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const StyledTitle('Create Event')),
+      appBar: AppBar(title: const StyledTitle('Event Details')),
       body: Container(
         padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
         child: Stack(
