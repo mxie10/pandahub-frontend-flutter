@@ -51,6 +51,7 @@ class EventStore extends ChangeNotifier {
   Future<void> addEvent(Map<String, dynamic> data) async {
     _setLoading(true);
     try {
+      
       final response = await http.post(
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
