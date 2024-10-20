@@ -146,6 +146,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
   @override
   void dispose() {
     // Dispose controllers to avoid memory leaks
+    _dateController.dispose();
+    _timeController.dispose();
     super.dispose();
   }
 

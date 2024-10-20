@@ -113,6 +113,8 @@ class _CreateScreenState extends State<CreateScreen> {
   @override
   void dispose() {
     // Dispose controllers to avoid memory leaks
+    _dateController.dispose();
+    _timeController.dispose();
     super.dispose();
   }
 
