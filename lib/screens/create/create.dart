@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pandahubfrontend/screens/create/date_picker.dart';
 import 'package:pandahubfrontend/services/events_store.dart';
@@ -56,7 +57,7 @@ class _CreateScreenState extends State<CreateScreen> {
     _locationController.text = '';
     _organizerController.text = '';
     _selectedEventType = 'Conference';
-    _errorMessage = 'Opps! Something goes wrong, Please try again later.';
+    _errorMessage = '';
     _showErrorMessage = false;
   }
 
@@ -86,13 +87,18 @@ class _CreateScreenState extends State<CreateScreen> {
     }
     
     try {
+      final dateTime = DateTime(
+      _selectedDate!.year,
+      _selectedDate!.month,
+      _selectedDate!.day,
+      _selectedTime!.hour,
+      _selectedTime!.minute,
+    );
       Map<String, dynamic> map = {};
       map['id'] = uuid.v4();
       map['title'] = _titleController.text.trim();
       map['description'] = _descriptionController.text.trim();
-      map['date'] = DateTime(_selectedDate!.year, _selectedDate!.month,
-              _selectedDate!.day, _selectedTime!.hour, _selectedTime!.minute)
-          .toString();
+      map['date'] = Timestamp.fromDate(dateTime);
       map['location'] = _locationController.text.trim();
       map['organizer'] = _organizerController.text.trim();
       map['eventType'] = _selectedEventType;
@@ -102,6 +108,7 @@ class _CreateScreenState extends State<CreateScreen> {
     } catch (e) {
       setState(() {
         _showErrorMessage = true;
+        _errorMessage = 'Add event failed, please try again later!';
       });
       rethrow;
     }
@@ -119,7 +126,10 @@ class _CreateScreenState extends State<CreateScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_errorMessage ?? 'Error occurred!'),
+            content: Text(
+              _errorMessage ?? 'Something wrong happened! Please try again later!',
+              style: const TextStyle(color: Colors.white)
+            ),
             duration: const Duration(seconds: 3), 
           ),
         );

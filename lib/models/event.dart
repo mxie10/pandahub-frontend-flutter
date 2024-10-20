@@ -15,7 +15,7 @@ class Event {
   final String id;
   final String title;
   final String description;
-  final String date;
+  final Timestamp date;
   final String location;
   final String organizer;
   final String eventType;
@@ -26,11 +26,11 @@ class Event {
         id: json['id'],
         title: json['title'] ?? '',
         description: json['description'] ?? '',
-        date: json['date'] ?? '',
+        date: json['date'] is Timestamp ? json['date'] : Timestamp.now(),
         location: json['location'] ?? '',
         organizer: json['organizer'] ?? '',
         eventType: json['eventType'] ?? '',
-        updatedAt: json['updatedAt'] ?? ''
+        updatedAt: json['updatedAt'] is Timestamp ? json['updatedAt'] : Timestamp.now(),
     );
   }
 

@@ -62,7 +62,7 @@ class EventStore extends ChangeNotifier {
           'location': data['location'],
           'organizer': data['organizer'],
           'eventType': data['eventType'],
-          'date': data['date'],
+          'date': (data['date'] as Timestamp).toDate().toIso8601String(),
         }),
       );
 

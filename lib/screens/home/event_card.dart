@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:pandahubfrontend/models/event.dart';
 import 'package:pandahubfrontend/screens/details/details.dart';
 import 'package:pandahubfrontend/shared/styled_heading.dart';
@@ -24,7 +25,7 @@ class EventCard extends StatelessWidget {
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [StyledHeading(event.title), StyledText(event.date.substring(0, 16))],
+              children: [StyledHeading(event.title), StyledText(DateFormat('yyyy-MM-dd HH:mm').format(event.date.toDate()))],
             ),
             const Expanded(child: SizedBox()),
             Icon(Icons.arrow_forward, color: AppColors.textColor)

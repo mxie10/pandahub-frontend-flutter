@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:pandahubfrontend/models/event.dart';
 import 'package:pandahubfrontend/screens/create/date_picker.dart';
 import 'package:pandahubfrontend/services/events_store.dart';
@@ -34,8 +35,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
   late final TextEditingController _descriptionController;
   late final TextEditingController _locationController;
   late final TextEditingController _organizerController;
-
+  
   String? _selectedEventType;
+  late bool _showErrorMessage;
+  String? _errorMessage;
 
   List<Map<String, dynamic>> get statsAsFormattedList => [
         {"title": 'Event title', 'controller': _titleController},
@@ -47,19 +50,22 @@ class _DetailsScreenState extends State<DetailsScreen> {
   @override
   void initState() {
     super.initState();
+    final eventDateTime = widget.event.date.toDate();
     _dateController = TextEditingController();
     _timeController = TextEditingController();
     _titleController = TextEditingController();
     _descriptionController = TextEditingController();
     _locationController = TextEditingController();
     _organizerController = TextEditingController();
-    _dateController.text = widget.event.date.split(' ')[0];
-    _timeController.text = widget.event.date.split(' ')[1];
+    _dateController.text = DateFormat('yyyy-MM-dd').format(eventDateTime);
+    _timeController.text = DateFormat('HH:mm').format(eventDateTime);
     _titleController.text = widget.event.title;
     _descriptionController.text = widget.event.description;
     _locationController.text = widget.event.location;
     _organizerController.text = widget.event.organizer;
     _selectedEventType = widget.event.eventType;
+    _showErrorMessage = false;
+    _errorMessage = '';
   }
 
   void _onDateChanged(DateTime date) {
@@ -104,17 +110,24 @@ class _DetailsScreenState extends State<DetailsScreen> {
         'The event has been successfully updated!'
       );
     } catch (e) {
+      setState(() {
+        _errorMessage = 'Update event failed, please try again later';
+        _showErrorMessage = true;
+      });
       rethrow;
     }
   }
 
   void onDeleteEvent() {
     try {
-      print(widget.event);
       Provider.of<EventStore>(context, listen: false)
           .deleteEvent(widget.event.id);
       Navigator.popUntil(context, (route) => route.isFirst);
     } catch (e) {
+      setState(() {
+        _errorMessage = 'Delete event failed, please try again later';
+        _showErrorMessage = true;
+      });
       rethrow;
     }
   }
@@ -127,6 +140,20 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_showErrorMessage == true) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              _errorMessage ?? 'Something wrong happened! Please try again later!',
+              style: const TextStyle(color: Colors.white)
+            ),
+            duration: const Duration(seconds: 3), 
+          ),
+        );
+      });
+      _showErrorMessage = false;
+    }
     return Scaffold(
       appBar: AppBar(title: const StyledTitle('Event Details')),
       body: Container(
@@ -216,6 +243,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
               ),
             ),
           ],
+          
         ),
       ),
     );
