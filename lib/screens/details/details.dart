@@ -195,7 +195,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           validator: (value) {
                             if (item['title'] == 'Event title' &&
                                 (value == null || value.isEmpty)) {
-                              return 'Please enter ${item['title']}';
+                              return 'Please enter event title';
                             }
                             return null;
                           },

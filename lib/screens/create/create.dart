@@ -155,7 +155,7 @@ class _CreateScreenState extends State<CreateScreen> {
                       style: const TextStyle(color:Colors.white),
                       validator: (value) {
                         if (item['title'] == 'Event title' && (value == null || value.isEmpty)) {
-                          return 'Please enter ${item['title']}';
+                          return 'Please enter event title';
                         }
                         return null;
                       },
