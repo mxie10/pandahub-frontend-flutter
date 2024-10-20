@@ -68,7 +68,10 @@ class EventStore extends ChangeNotifier {
 
       if (response.statusCode == 201) {
         notifyListeners();
-      } 
+      }else{
+        final errorMessage = json.decode(response.body)['message'];
+        throw Exception('Failed to create event: $errorMessage');
+      }
     }catch(e){
       rethrow;
     } finally {
@@ -97,6 +100,9 @@ class EventStore extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         notifyListeners(); 
+      }else{
+        final errorMessage = json.decode(response.body)['message'];
+        throw Exception('Failed to create event: $errorMessage');
       }
     }catch(e){
       rethrow;
@@ -117,6 +123,9 @@ class EventStore extends ChangeNotifier {
       if (response.statusCode == 200) {
         _events.removeWhere((event) => event.id == eventId);
         notifyListeners(); 
+      }else{
+        final errorMessage = json.decode(response.body)['message'];
+        throw Exception('Failed to create event: $errorMessage');
       }
     }catch(e){
       rethrow;
