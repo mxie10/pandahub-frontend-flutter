@@ -30,7 +30,7 @@ void fetchEvents() {
   _setLoading(true);
   try {
     FirebaseFirestore.instance
-      .collection('events').orderBy('date', descending: true) .snapshots()
+      .collection('events').orderBy('date', descending: true).snapshots()
       .listen((snapshot) {
           _allEvents = snapshot.docs.map((doc) {
             final data = doc.data();
