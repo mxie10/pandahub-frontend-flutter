@@ -52,7 +52,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
   void initState() {
     super.initState();
     final eventDateTime = widget.event.date.toDate();
-
     _selectedDate = eventDateTime;
     _selectedTime = TimeOfDay.fromDateTime(eventDateTime);
     _dateController.text = DateFormat('yyyy-MM-dd').format(eventDateTime);
@@ -219,13 +218,16 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       dropdownColor: Colors.black,
                     ),
                   ),
-                  // Create button
+                  // Details button
+                  const SizedBox(
+                    height: 20,
+                  ),
                   SizedBox(
                     width: 500,
                     child: FilledButton(
                       onPressed: onUpdateEvent,
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 3, 3, 3),
+                        backgroundColor: const Color.fromARGB(255, 2, 17, 56),
                         foregroundColor: Colors.white,
                       ),
                       child: const Text('Update'),

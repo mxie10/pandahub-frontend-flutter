@@ -25,7 +25,9 @@ class EventCard extends StatelessWidget {
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [StyledHeading(event.title), StyledText(DateFormat('yyyy-MM-dd HH:mm').format(event.date.toDate()))],
+              children: [
+                StyledHeading(event.title), StyledText(DateFormat('yyyy-MM-dd HH:mm').format(event.date.toDate()))
+              ],
             ),
             const Expanded(child: SizedBox()),
             Icon(Icons.arrow_forward, color: AppColors.textColor)
