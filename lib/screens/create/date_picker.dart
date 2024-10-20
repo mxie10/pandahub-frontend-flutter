@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pandahubfrontend/shared/styled_text_field.dart';
 
 class DateTimePicker extends StatefulWidget {
   final DateTime? selectedDate;
@@ -16,7 +15,7 @@ class DateTimePicker extends StatefulWidget {
     required this.dateController,
     required this.timeController,
     required this.onDateChanged,
-    required this.onTimeChanged
+    required this.onTimeChanged,
   });
 
   @override
@@ -71,7 +70,8 @@ class _DateTimePickerState extends State<DateTimePicker> {
   }
 
   void _updateTimeInTextField() {
-    widget.timeController.text = "${_selectedTime!.hour.toString()} : ${(_selectedTime!.minute.toString())}";
+    widget.timeController.text =
+        "${_selectedTime!.hour.toString()}:${_selectedTime!.minute.toString().padLeft(2, '0')}";
   }
 
   @override
@@ -84,20 +84,38 @@ class _DateTimePickerState extends State<DateTimePicker> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        StyledTextField(
-          textFieldcontroller: widget.dateController,
-          labelText: 'Pick up a date',
-          icon:  const Icon(Icons.calendar_month),
-          onPress: () => _selectDate(context),
-          isReadOnly:true,
+        TextFormField(
+          controller: widget.dateController,
+          readOnly: true,
+          decoration: const InputDecoration(
+            labelText: 'Pick up a date',
+            icon: Icon(Icons.calendar_month),
+          ),
+          style: const TextStyle(color:Colors.white),
+          onTap: () => _selectDate(context),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter event date';
+            }
+            return null;
+          },
         ),
         const SizedBox(height: 10),
-        StyledTextField(
-          textFieldcontroller: widget.timeController,
-          labelText: 'Pick up a time',
-          icon:  const Icon(Icons.timelapse),
-          onPress: () => _selectTime(context),
-          isReadOnly:true,
+        TextFormField(
+          controller: widget.timeController,
+          readOnly: true,
+          decoration: const InputDecoration(
+            labelText: 'Pick up a time',
+            icon: Icon(Icons.timelapse),
+          ),
+          style: const TextStyle(color:Colors.white),
+          onTap: () => _selectTime(context),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter event time';
+            }
+            return null;
+          },
         ),
         const SizedBox(height: 10),
       ],

@@ -67,11 +67,11 @@ class _CreateScreenState extends State<CreateScreen> {
   }
 
   void onCreateEvent() {
-    if(_dateController.text.isEmpty || _timeController.text.isEmpty){
-      showCustomDialog(context, 'Oops! Some fields are missing!',
-          'Event date and event time are needed!');
-      return;
-    }
+    // if(_dateController.text.isEmpty || _timeController.text.isEmpty){
+    //   showCustomDialog(context, 'Oops! Some fields are missing!',
+    //       'Event date and event time are needed!');
+    //   return;
+    // }
     if (_formKey.currentState!.validate()) {
       try {
         final dateTime = DateTime(
@@ -155,12 +155,6 @@ class _CreateScreenState extends State<CreateScreen> {
                       style: const TextStyle(color:Colors.white),
                       validator: (value) {
                         if (item['title'] == 'Event title' && (value == null || value.isEmpty)) {
-                          return 'Please enter ${item['title']}';
-                        }
-                        if (item['title'] == 'Event date' && (value == null || value.isEmpty)) {
-                          return 'Please enter ${item['title']}';
-                        }
-                        if (item['title'] == 'Event time' && (value == null || value.isEmpty)) {
                           return 'Please enter ${item['title']}';
                         }
                         return null;

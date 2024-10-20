@@ -197,14 +197,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                 (value == null || value.isEmpty)) {
                               return 'Please enter ${item['title']}';
                             }
-                            if (item['title'] == 'Event date' &&
-                                (value == null || value.isEmpty)) {
-                              return 'Please enter ${item['title']}';
-                            }
-                            if (item['title'] == 'Event time' &&
-                                (value == null || value.isEmpty)) {
-                              return 'Please enter ${item['title']}';
-                            }
                             return null;
                           },
                         ),
