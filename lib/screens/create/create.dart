@@ -67,11 +67,6 @@ class _CreateScreenState extends State<CreateScreen> {
   }
 
   void onCreateEvent() {
-    // if(_dateController.text.isEmpty || _timeController.text.isEmpty){
-    //   showCustomDialog(context, 'Oops! Some fields are missing!',
-    //       'Event date and event time are needed!');
-    //   return;
-    // }
     if (_formKey.currentState!.validate()) {
       try {
         final dateTime = DateTime(
