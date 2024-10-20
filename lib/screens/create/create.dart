@@ -24,6 +24,8 @@ class CreateScreen extends StatefulWidget {
 }
 
 class _CreateScreenState extends State<CreateScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   final TextEditingController _dateController = TextEditingController();
@@ -47,9 +49,6 @@ class _CreateScreenState extends State<CreateScreen> {
   @override
   void initState() {
     super.initState();
-    _descriptionController.text = '';
-    _locationController.text = '';
-    _organizerController.text = '';
     _selectedEventType = 'Conference';
     _errorMessage = '';
     _showErrorMessage = false;
@@ -68,45 +67,43 @@ class _CreateScreenState extends State<CreateScreen> {
   }
 
   void onCreateEvent() {
-    if (_dateController.text.trim().isEmpty ||
-        _timeController.text.trim().isEmpty ||
-        _titleController.text.trim().isEmpty) {
+    if(_dateController.text.isEmpty || _timeController.text.isEmpty){
       showCustomDialog(context, 'Oops! Some fields are missing!',
-          'Event date, time and title are needed!');
+          'Event date and event time are needed!');
       return;
     }
+    if (_formKey.currentState!.validate()) {
+      try {
+        final dateTime = DateTime(
+          _selectedDate!.year,
+          _selectedDate!.month,
+          _selectedDate!.day,
+          _selectedTime!.hour,
+          _selectedTime!.minute,
+        );
+        Map<String, dynamic> map = {};
+        map['id'] = uuid.v4();
+        map['title'] = _titleController.text.trim();
+        map['description'] = _descriptionController.text.trim();
+        map['date'] = Timestamp.fromDate(dateTime);
+        map['location'] = _locationController.text.trim();
+        map['organizer'] = _organizerController.text.trim();
+        map['eventType'] = _selectedEventType;
 
-    try {
-      final dateTime = DateTime(
-        _selectedDate!.year,
-        _selectedDate!.month,
-        _selectedDate!.day,
-        _selectedTime!.hour,
-        _selectedTime!.minute,
-      );
-      Map<String, dynamic> map = {};
-      map['id'] = uuid.v4();
-      map['title'] = _titleController.text.trim();
-      map['description'] = _descriptionController.text.trim();
-      map['date'] = Timestamp.fromDate(dateTime);
-      map['location'] = _locationController.text.trim();
-      map['organizer'] = _organizerController.text.trim();
-      map['eventType'] = _selectedEventType;
-
-      Provider.of<EventStore>(context, listen: false).addEvent(map);
-      Navigator.popUntil(context, (route) => route.isFirst);
-    } catch (e) {
-      setState(() {
-        _showErrorMessage = true;
-        _errorMessage = 'Add event failed, please try again later!';
-      });
-      rethrow;
+        Provider.of<EventStore>(context, listen: false).addEvent(map);
+        Navigator.popUntil(context, (route) => route.isFirst);
+      } catch (e) {
+        setState(() {
+          _showErrorMessage = true;
+          _errorMessage = 'Add event failed, please try again later!';
+        });
+        rethrow;
+      }
     }
   }
 
   @override
   void dispose() {
-    // Dispose controllers to avoid memory leaks
     _dateController.dispose();
     _timeController.dispose();
     super.dispose();
@@ -119,86 +116,104 @@ class _CreateScreenState extends State<CreateScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                _errorMessage ??
-                    'Something wrong happened! Please try again later!',
-                style: const TextStyle(color: Colors.white)),
+              _errorMessage ?? 'Something wrong happened! Please try again later!',
+              style: const TextStyle(color: Colors.white),
+            ),
             duration: const Duration(seconds: 3),
           ),
         );
       });
       _showErrorMessage = false;
     }
+
     return Scaffold(
       appBar: AppBar(title: const StyledTitle('Create Event')),
       body: Container(
         padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Date time picker
-              DateTimePicker(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                DateTimePicker(
                   selectedDate: _selectedDate,
                   selectedTime: _selectedTime,
                   dateController: _dateController,
                   timeController: _timeController,
                   onDateChanged: _onDateChanged,
-                  onTimeChanged: _onTimeChanged),
-              // Rest fields
-              ...statsAsFormattedList.map((item) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: StyledTextField(
-                    textFieldcontroller: item['controller'],
-                    labelText: item['title'],
-                  ),
-                );
-              }),
-              // Dropdown list for event types
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: DropdownButtonFormField<String>(
-                  value: _selectedEventType,
-                  hint: const Text(
-                    'Select Event Type',
-                    style: TextStyle(
-                        color: Color.fromARGB(255, 133, 131, 131),
-                        fontSize: 14),
-                  ),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectedEventType = newValue;
-                    });
-                  },
-                  items: eventTypeList
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(
-                        value,
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 14),
-                      ),
-                    );
-                  }).toList(),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(4.0),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                  ),
-                  dropdownColor: Colors.black,
+                  onTimeChanged: _onTimeChanged,
                 ),
-              ),
-              // Create button
-              SizedBox(
-                width: 500,
-                child: FilledButton(
-                    onPressed: () {
-                      onCreateEvent();
+                // Rest fields as form fields
+                ...statsAsFormattedList.map((item) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: TextFormField(
+                      controller: item['controller'],
+                      decoration: InputDecoration(
+                        labelText: item['title'],
+                        border: const OutlineInputBorder(),
+                      ),
+                      style: const TextStyle(color:Colors.white),
+                      validator: (value) {
+                        if (item['title'] == 'Event title' && (value == null || value.isEmpty)) {
+                          return 'Please enter ${item['title']}';
+                        }
+                        if (item['title'] == 'Event date' && (value == null || value.isEmpty)) {
+                          return 'Please enter ${item['title']}';
+                        }
+                        if (item['title'] == 'Event time' && (value == null || value.isEmpty)) {
+                          return 'Please enter ${item['title']}';
+                        }
+                        return null;
+                      },
+                    ),
+                  );
+                }),
+                // Dropdown list for event types
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: DropdownButtonFormField<String>(
+                    value: _selectedEventType,
+                    hint: const Text(
+                      'Select Event Type',
+                      style: TextStyle(
+                          color: Color.fromARGB(255, 133, 131, 131),
+                          fontSize: 14),
+                    ),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedEventType = newValue;
+                      });
                     },
-                    child: const Text('Create')),
-              ),
-            ],
+                    items: eventTypeList
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(
+                          value,
+                          style: const TextStyle(color: Colors.white, fontSize: 14),
+                        ),
+                      );
+                    }).toList(),
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(4.0),
+                        borderSide: const BorderSide(color: Colors.grey),
+                      ),
+                    ),
+                    dropdownColor: Colors.black,
+                  ),
+                ),
+                // Create button
+                SizedBox(
+                  width: 500,
+                  child: FilledButton(
+                    onPressed: onCreateEvent,
+                    child: const Text('Create'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

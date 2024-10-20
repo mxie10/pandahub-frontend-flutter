@@ -28,6 +28,8 @@ class DetailsScreen extends StatefulWidget {
 }
 
 class _DetailsScreenState extends State<DetailsScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   final TextEditingController _dateController = TextEditingController();
@@ -36,7 +38,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _organizerController = TextEditingController();
-  
+
   String? _selectedEventType;
   late bool _showErrorMessage;
   String? _errorMessage;
@@ -78,13 +80,17 @@ class _DetailsScreenState extends State<DetailsScreen> {
   }
 
   void onUpdateEvent() {
-    if (_dateController.text.trim().isEmpty ||
-        _timeController.text.trim().isEmpty ||
-        _titleController.text.trim().isEmpty) {
+    if(_dateController.text.isEmpty || _timeController.text.isEmpty){
+      showCustomDialog(context, 'Oops! Some fields are missing!',
+          'Event date and event time are needed!');
+      return;
+    }
+    if (!_formKey.currentState!.validate()) {
       showCustomDialog(
         context, 
         'Oops! Some fields are missing!',
-        'Event date, time and title are needed!');
+        'Please fill out all required fields.',
+      );
       return;
     }
 
@@ -97,21 +103,22 @@ class _DetailsScreenState extends State<DetailsScreen> {
         _selectedTime!.minute,
       );
 
-      Map<String, dynamic> map = {};
-      map['id'] = widget.event.id;
-      map['title'] = _titleController.text.trim();
-      map['description'] = _descriptionController.text.trim();
-      map['date'] = Timestamp.fromDate(dateTime);
-      map['location'] = _locationController.text.trim();
-      map['organizer'] = _organizerController.text.trim();
-      map['eventType'] = _selectedEventType;
+      Map<String, dynamic> map = {
+        'id': widget.event.id,
+        'title': _titleController.text.trim(),
+        'description': _descriptionController.text.trim(),
+        'date': Timestamp.fromDate(dateTime),
+        'location': _locationController.text.trim(),
+        'organizer': _organizerController.text.trim(),
+        'eventType': _selectedEventType,
+      };
 
       Provider.of<EventStore>(context, listen: false).updateEvent(map);
       
       showCustomDialog(
         context, 
         'Success!',
-        'The event has been successfully updated!'
+        'The event has been successfully updated!',
       );
     } catch (e) {
       setState(() {
@@ -124,8 +131,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   void onDeleteEvent() {
     try {
-      Provider.of<EventStore>(context, listen: false)
-          .deleteEvent(widget.event.id);
+      Provider.of<EventStore>(context, listen: false).deleteEvent(widget.event.id);
       Navigator.popUntil(context, (route) => route.isFirst);
     } catch (e) {
       setState(() {
@@ -138,7 +144,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   @override
   void dispose() {
-    // Dispose controllers to avoid memory leaks
     _dateController.dispose();
     _timeController.dispose();
     super.dispose();
@@ -146,113 +151,139 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_showErrorMessage == true) {
+    if (_showErrorMessage) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              _errorMessage ?? 'Something wrong happened! Please try again later!',
-              style: const TextStyle(color: Colors.white)
+              _errorMessage ?? 'Something went wrong! Please try again later!',
+              style: const TextStyle(color: Colors.white),
             ),
-            duration: const Duration(seconds: 3), 
+            duration: const Duration(seconds: 3),
           ),
         );
       });
       _showErrorMessage = false;
     }
+
     return Scaffold(
       appBar: AppBar(title: const StyledTitle('Event Details')),
       body: Container(
         padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-        child: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Column(
-                children: [
-                  // Date time picker
-                  DateTimePicker(
-                    selectedDate: _selectedDate,
-                    selectedTime: _selectedTime,
-                    dateController: _dateController,
-                    timeController: _timeController,
-                    onDateChanged: _onDateChanged,
-                    onTimeChanged: _onTimeChanged,
-                  ),
-                  // Rest fields
-                  ...statsAsFormattedList.map((item) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: StyledTextField(
-                        textFieldcontroller: item['controller'],
-                        labelText: item['title'],
-                      ),
-                    );
-                  }),
-                  // Dropdown list for event types
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: DropdownButtonFormField<String>(
-                      value: _selectedEventType,
-                      hint: const Text(
-                        'Select Event Type',
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 133, 131, 131),
-                            fontSize: 14),
-                      ),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedEventType = newValue;
-                        });
-                      },
-                      items: eventTypeList
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(
-                            value,
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 14),
+        child: Form(
+          key: _formKey,
+          child: Stack(
+            children: [
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // Date time picker
+                    DateTimePicker(
+                      selectedDate: _selectedDate,
+                      selectedTime: _selectedTime,
+                      dateController: _dateController,
+                      timeController: _timeController,
+                      onDateChanged: _onDateChanged,
+                      onTimeChanged: _onTimeChanged,
+                    ),
+                    // Form fields
+                    ...statsAsFormattedList.map((item) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: TextFormField(
+                          controller: item['controller'],
+                          decoration: InputDecoration(
+                            labelText: item['title'],
+                            border: const OutlineInputBorder(),
                           ),
-                        );
-                      }).toList(),
-                      dropdownColor: Colors.black,
-                    ),
-                  ),
-                  // Details button
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  SizedBox(
-                    width: 500,
-                    child: FilledButton(
-                      onPressed: onUpdateEvent,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 2, 17, 56),
-                        foregroundColor: Colors.white,
+                          style: const TextStyle(color:Colors.white),
+                          validator: (value) {
+                            if (item['title'] == 'Event title' && (value == null || value.isEmpty)) {
+                              return 'Please enter ${item['title']}';
+                            }
+                            if (item['title'] == 'Event date' && (value == null || value.isEmpty)) {
+                              return 'Please enter ${item['title']}';
+                            }
+                            if (item['title'] == 'Event time' && (value == null || value.isEmpty)) {
+                              return 'Please enter ${item['title']}';
+                            }
+                            return null;
+                          },
+                        ),
+                      );
+                    }),
+                    // Dropdown for event types
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedEventType,
+                        hint: const Text(
+                          'Select Event Type',
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 133, 131, 131),
+                            fontSize: 14,
+                          ),
+                        ),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedEventType = newValue;
+                          });
+                        },
+                        items: eventTypeList
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(4.0),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                        ),
+                        dropdownColor: Colors.black,
                       ),
-                      child: const Text('Update'),
                     ),
-                  ),
-                  const SizedBox(height: 80),
-                ],
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: SizedBox(
-                width: 500,
-                child: FilledButton(
-                  onPressed: onDeleteEvent,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('Delete'),
+                    // Update button
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: 500,
+                      child: FilledButton(
+                        onPressed: onUpdateEvent,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color.fromARGB(255, 2, 17, 56),
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('Update'),
+                      ),
+                    ),
+                    const SizedBox(height: 80),
+                  ],
                 ),
               ),
-            ),
-          ],
-          
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  width: 500,
+                  child: FilledButton(
+                    onPressed: onDeleteEvent,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Delete'),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
