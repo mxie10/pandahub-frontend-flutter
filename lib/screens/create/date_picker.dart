@@ -77,7 +77,6 @@ class _DateTimePickerState extends State<DateTimePicker> {
   @override
   void dispose() {
     // Dispose of the controller when no longer needed
-    widget.dateController.dispose(); 
     super.dispose();
   }
 
