@@ -26,26 +26,27 @@ class EventStore extends ChangeNotifier {
   }
 
 // Fetch events
-  void fetchEvents() {
-    _setLoading(true);
-    try {
-      FirebaseFirestore.instance
-          .collection('events')
-          .snapshots()
-          .listen((snapshot) {
-        _allEvents = snapshot.docs.map((doc) {
-          final data = doc.data();
-          return Event.fromJson(data);
-        }).toList();
-        _events = List.from(_allEvents); 
-        notifyListeners();
-      });
-    }catch (e) {
-      rethrow;
-    } finally {
-      _setLoading(false);
-    }
+void fetchEvents() {
+  _setLoading(true);
+  try {
+    FirebaseFirestore.instance
+        .collection('events')
+        .orderBy('date', descending: true) 
+        .snapshots()
+        .listen((snapshot) {
+      _allEvents = snapshot.docs.map((doc) {
+        final data = doc.data();
+        return Event.fromJson(data);
+      }).toList();
+      _events = List.from(_allEvents); 
+      notifyListeners();
+    });
+  } catch (e) {
+    rethrow;
+  } finally {
+    _setLoading(false);
   }
+}
 
   // Add event
   Future<void> addEvent(Map<String, dynamic> data) async {
