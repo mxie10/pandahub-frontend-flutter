@@ -81,58 +81,52 @@ class _DetailsScreenState extends State<DetailsScreen> {
   }
 
   void onUpdateEvent() {
-    if(_dateController.text.isEmpty || _timeController.text.isEmpty){
+    if (_dateController.text.isEmpty || _timeController.text.isEmpty) {
       showCustomDialog(context, 'Oops! Some fields are missing!',
           'Event date and event time are needed!');
       return;
     }
-    if (!_formKey.currentState!.validate()) {
-      showCustomDialog(
-        context, 
-        'Oops! Some fields are missing!',
-        'Please fill out all required fields.',
-      );
-      return;
-    }
+    if (_formKey.currentState!.validate()) {
+      try {
+        final dateTime = DateTime(
+          _selectedDate!.year,
+          _selectedDate!.month,
+          _selectedDate!.day,
+          _selectedTime!.hour,
+          _selectedTime!.minute,
+        );
 
-    try {
-      final dateTime = DateTime(
-        _selectedDate!.year,
-        _selectedDate!.month,
-        _selectedDate!.day,
-        _selectedTime!.hour,
-        _selectedTime!.minute,
-      );
+        Map<String, dynamic> map = {
+          'id': widget.event.id,
+          'title': _titleController.text.trim(),
+          'description': _descriptionController.text.trim(),
+          'date': Timestamp.fromDate(dateTime),
+          'location': _locationController.text.trim(),
+          'organizer': _organizerController.text.trim(),
+          'eventType': _selectedEventType,
+        };
 
-      Map<String, dynamic> map = {
-        'id': widget.event.id,
-        'title': _titleController.text.trim(),
-        'description': _descriptionController.text.trim(),
-        'date': Timestamp.fromDate(dateTime),
-        'location': _locationController.text.trim(),
-        'organizer': _organizerController.text.trim(),
-        'eventType': _selectedEventType,
-      };
+        Provider.of<EventStore>(context, listen: false).updateEvent(map);
 
-      Provider.of<EventStore>(context, listen: false).updateEvent(map);
-      
-      showCustomDialog(
-        context, 
-        'Success!',
-        'The event has been successfully updated!',
-      );
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Update event failed, please try again later';
-        _showErrorMessage = true;
-      });
-      rethrow;
+        showCustomDialog(
+          context,
+          'Success!',
+          'The event has been successfully updated!',
+        );
+      } catch (e) {
+        setState(() {
+          _errorMessage = 'Update event failed, please try again later';
+          _showErrorMessage = true;
+        });
+        rethrow;
+      }
     }
   }
 
   void onDeleteEvent() {
     try {
-      Provider.of<EventStore>(context, listen: false).deleteEvent(widget.event.id);
+      Provider.of<EventStore>(context, listen: false)
+          .deleteEvent(widget.event.id);
       Navigator.popUntil(context, (route) => route.isFirst);
     } catch (e) {
       setState(() {
@@ -197,15 +191,18 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             labelText: item['title'],
                             border: const OutlineInputBorder(),
                           ),
-                          style: const TextStyle(color:Colors.white),
+                          style: const TextStyle(color: Colors.white),
                           validator: (value) {
-                            if (item['title'] == 'Event title' && (value == null || value.isEmpty)) {
+                            if (item['title'] == 'Event title' &&
+                                (value == null || value.isEmpty)) {
                               return 'Please enter ${item['title']}';
                             }
-                            if (item['title'] == 'Event date' && (value == null || value.isEmpty)) {
+                            if (item['title'] == 'Event date' &&
+                                (value == null || value.isEmpty)) {
                               return 'Please enter ${item['title']}';
                             }
-                            if (item['title'] == 'Event time' && (value == null || value.isEmpty)) {
+                            if (item['title'] == 'Event time' &&
+                                (value == null || value.isEmpty)) {
                               return 'Please enter ${item['title']}';
                             }
                             return null;
