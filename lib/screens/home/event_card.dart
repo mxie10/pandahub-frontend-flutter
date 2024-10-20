@@ -13,7 +13,10 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localDateTime = event.date.toDate().toLocal();
+    final utcDateTime = event.date.toDate();
+    final utcAdjustedTime = utcDateTime.add(const Duration(hours: 4));
+    final localDateTime = utcAdjustedTime.toLocal();
+    
     return GestureDetector(
       onTap: () {
         Navigator.push(context,

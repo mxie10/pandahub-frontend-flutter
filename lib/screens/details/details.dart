@@ -52,11 +52,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
   @override
   void initState() {
     super.initState();
-    final eventDateTime = widget.event.date.toDate().toLocal();
-    _selectedDate = eventDateTime;
-    _selectedTime = TimeOfDay.fromDateTime(eventDateTime);
-    _dateController.text = DateFormat('yyyy-MM-dd').format(eventDateTime);
-    _timeController.text = DateFormat('HH:mm').format(eventDateTime);
+    final utcDateTime = widget.event.date.toDate();
+    final utcAdjustedTime = utcDateTime.add(const Duration(hours: 4));
+    final localDateTime = utcAdjustedTime.toLocal();
+    _selectedDate = localDateTime;
+    _selectedTime = TimeOfDay.fromDateTime(localDateTime);
+    _dateController.text = DateFormat('yyyy-MM-dd').format(localDateTime);
+    _timeController.text = DateFormat('HH:mm').format(localDateTime);
     _titleController.text = widget.event.title;
     _descriptionController.text = widget.event.description;
     _locationController.text = widget.event.location;
