@@ -143,7 +143,6 @@ class _CreateScreenState extends State<CreateScreen> {
                   onDateChanged: _onDateChanged,
                   onTimeChanged: _onTimeChanged,
                 ),
-                // Rest fields as form fields
                 ...statsAsFormattedList.map((item) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 10),
