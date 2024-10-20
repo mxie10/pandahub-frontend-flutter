@@ -136,6 +136,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
   void dispose() {
     _dateController.dispose();
     _timeController.dispose();
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _locationController.dispose();
+    _organizerController.dispose();
     super.dispose();
   }
 
