@@ -77,23 +77,19 @@ class _CreateScreenState extends State<CreateScreen> {
     if (_dateController.text.trim().isEmpty ||
         _timeController.text.trim().isEmpty ||
         _titleController.text.trim().isEmpty) {
-
-      showCustomDialog(
-        context, 
-        'Oops! Some fields are missing!', 
-        'Event date, time and title are needed!'
-      );
+      showCustomDialog(context, 'Oops! Some fields are missing!',
+          'Event date, time and title are needed!');
       return;
     }
-    
+
     try {
       final dateTime = DateTime(
-      _selectedDate!.year,
-      _selectedDate!.month,
-      _selectedDate!.day,
-      _selectedTime!.hour,
-      _selectedTime!.minute,
-    );
+        _selectedDate!.year,
+        _selectedDate!.month,
+        _selectedDate!.day,
+        _selectedTime!.hour,
+        _selectedTime!.minute,
+      );
       Map<String, dynamic> map = {};
       map['id'] = uuid.v4();
       map['title'] = _titleController.text.trim();
@@ -127,10 +123,10 @@ class _CreateScreenState extends State<CreateScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              _errorMessage ?? 'Something wrong happened! Please try again later!',
-              style: const TextStyle(color: Colors.white)
-            ),
-            duration: const Duration(seconds: 3), 
+                _errorMessage ??
+                    'Something wrong happened! Please try again later!',
+                style: const TextStyle(color: Colors.white)),
+            duration: const Duration(seconds: 3),
           ),
         );
       });
@@ -204,8 +200,7 @@ class _CreateScreenState extends State<CreateScreen> {
                     onPressed: () {
                       onCreateEvent();
                     },
-                    child: const Text('Create')
-                ),
+                    child: const Text('Create')),
               ),
             ],
           ),

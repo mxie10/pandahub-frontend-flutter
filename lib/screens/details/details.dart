@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pandahubfrontend/models/event.dart';
@@ -51,6 +52,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
   void initState() {
     super.initState();
     final eventDateTime = widget.event.date.toDate();
+
+    _selectedDate = eventDateTime;
+    _selectedTime = TimeOfDay.fromDateTime(eventDateTime);
     _dateController = TextEditingController();
     _timeController = TextEditingController();
     _titleController = TextEditingController();
@@ -84,7 +88,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
     if (_dateController.text.trim().isEmpty ||
         _timeController.text.trim().isEmpty ||
         _titleController.text.trim().isEmpty) {
-
       showCustomDialog(
         context, 
         'Oops! Some fields are missing!',
@@ -93,11 +96,19 @@ class _DetailsScreenState extends State<DetailsScreen> {
     }
 
     try {
+      final dateTime = DateTime(
+        _selectedDate!.year,
+        _selectedDate!.month,
+        _selectedDate!.day,
+        _selectedTime!.hour,
+        _selectedTime!.minute,
+      );
+
       Map<String, dynamic> map = {};
       map['id'] = widget.event.id;
       map['title'] = _titleController.text.trim();
       map['description'] = _descriptionController.text.trim();
-      map['date'] = '${_dateController.text} ${_timeController.text}';
+      map['date'] = Timestamp.fromDate(dateTime);
       map['location'] = _locationController.text.trim();
       map['organizer'] = _organizerController.text.trim();
       map['eventType'] = _selectedEventType;

@@ -89,14 +89,16 @@ class _DateTimePickerState extends State<DateTimePicker> {
           textFieldcontroller: widget.dateController,
           labelText: 'Pick up a date',
           icon:  const Icon(Icons.calendar_month),
-          onPress: () => _selectDate(context)
+          onPress: () => _selectDate(context),
+          isReadOnly:true,
         ),
         const SizedBox(height: 10),
         StyledTextField(
           textFieldcontroller: widget.timeController,
           labelText: 'Pick up a time',
           icon:  const Icon(Icons.timelapse),
-          onPress: () => _selectTime(context)
+          onPress: () => _selectTime(context),
+          isReadOnly:true,
         ),
         const SizedBox(height: 10),
       ],
