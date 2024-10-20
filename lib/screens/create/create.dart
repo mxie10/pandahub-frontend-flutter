@@ -2,9 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pandahubfrontend/screens/create/date_picker.dart';
 import 'package:pandahubfrontend/services/events_store.dart';
-import 'package:pandahubfrontend/shared/styled_text_field.dart';
 import 'package:pandahubfrontend/shared/styled_title.dart';
-import 'package:pandahubfrontend/utils/dialog_util.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
