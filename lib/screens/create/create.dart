@@ -26,12 +26,12 @@ class CreateScreen extends StatefulWidget {
 class _CreateScreenState extends State<CreateScreen> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
-  late TextEditingController _dateController;
-  late TextEditingController _timeController;
-  late final TextEditingController _titleController;
-  late final TextEditingController _descriptionController;
-  late final TextEditingController _locationController;
-  late final TextEditingController _organizerController;
+  final TextEditingController _dateController = TextEditingController();
+  final TextEditingController _timeController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _organizerController = TextEditingController();
 
   String? _selectedEventType;
   bool? _showErrorMessage;
@@ -47,12 +47,6 @@ class _CreateScreenState extends State<CreateScreen> {
   @override
   void initState() {
     super.initState();
-    _dateController = TextEditingController();
-    _timeController = TextEditingController();
-    _titleController = TextEditingController();
-    _descriptionController = TextEditingController();
-    _locationController = TextEditingController();
-    _organizerController = TextEditingController();
     _descriptionController.text = '';
     _locationController.text = '';
     _organizerController.text = '';
