@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:pandahubfrontend/models/event.dart';
 import 'package:pandahubfrontend/screens/create/date_picker.dart';
 import 'package:pandahubfrontend/services/events_store.dart';
-import 'package:pandahubfrontend/shared/styled_text_field.dart';
 import 'package:pandahubfrontend/shared/styled_title.dart';
 import 'package:pandahubfrontend/utils/dialog_util.dart';
 import 'package:provider/provider.dart';
@@ -53,7 +52,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
   @override
   void initState() {
     super.initState();
-    final eventDateTime = widget.event.date.toDate();
+    final eventDateTime = widget.event.date.toDate().toLocal();
     _selectedDate = eventDateTime;
     _selectedTime = TimeOfDay.fromDateTime(eventDateTime);
     _dateController.text = DateFormat('yyyy-MM-dd').format(eventDateTime);

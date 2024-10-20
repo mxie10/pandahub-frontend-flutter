@@ -13,6 +13,7 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localDateTime = event.date.toDate().toLocal();
     return GestureDetector(
       onTap: () {
         Navigator.push(context,
@@ -26,7 +27,7 @@ class EventCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                StyledHeading(event.title), StyledText('${DateFormat('yyyy-MM-dd HH:mm').format(event.date.toDate())}(UTC)')
+                StyledHeading(event.title), StyledText(DateFormat('yyyy-MM-dd HH:mm').format(localDateTime))
               ],
             ),
             const Expanded(child: SizedBox()),
