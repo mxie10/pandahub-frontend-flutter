@@ -30,14 +30,13 @@ void fetchEvents() {
   _setLoading(true);
   try {
     FirebaseFirestore.instance
-        .collection('events')
-        .orderBy('date', descending: true) 
-        .snapshots()
-        .listen((snapshot) {
-      _allEvents = snapshot.docs.map((doc) {
-        final data = doc.data();
-        return Event.fromJson(data);
-      }).toList();
+      .collection('events').orderBy('date', descending: true) .snapshots()
+      .listen((snapshot) {
+          _allEvents = snapshot.docs.map((doc) {
+            final data = doc.data();
+            return Event.fromJson(data);
+          })
+      .toList();
       _events = List.from(_allEvents); 
       notifyListeners();
     });
